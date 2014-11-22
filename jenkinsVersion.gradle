@@ -1,0 +1,7 @@
+rootProject {
+    afterEvaluate { project ->
+        def newVersion = "$project.version.$System.env.BUILD_NUMBER"
+        println "Transforming version specifier $project.version into $newVersion"
+        project.version = newVersion
+    }
+}
