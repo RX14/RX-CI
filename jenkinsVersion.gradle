@@ -1,5 +1,14 @@
 rootProject {
     afterEvaluate { project ->
+        if (System.env.JENKINS_VERSION_FILE != null) {
+            def file = new File(System.env.JENKINS_VERSION_FILE)
+            file.withWriter { out ->
+                out.writeLine "version = $project.version"
+            }
+
+            println "Wrote version to $file.absolutePath"
+        }
+
         def newVersion = "$project.version.$System.env.BUILD_NUMBER"
         println "Transforming version specifier $project.version into $newVersion"
         project.version = newVersion
