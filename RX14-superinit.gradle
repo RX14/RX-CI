@@ -1,0 +1,82 @@
+def envExists(String name) {
+    return System.getenv(name) != null
+}
+
+rootProject {
+    afterEvaluate { project ->
+        //Jenkins versioning
+
+        if (envExists("JENKINS_VERSION_FILE")) {
+            def file = new File(System.env.JENKINS_VERSION_FILE)
+            file.withWriter { out ->
+                out.writeLine "version = $project.version"
+            }
+
+            println "Wrote version to $file.absolutePath"
+        }
+
+        if (!envExists("JENKINS_SKIP_VERSION_EDIT")) {
+            def newVersion = "$project.version.$System.env.BUILD_NUMBER"
+            println "Transforming version specifier $project.version into $newVersion"
+            project.version = newVersion
+        }
+
+        //For missing tasks
+
+        if (envExists("GRADLE_API_TASK_DIR")) {
+            println "Adding apiJar task (include \"$System.env.GRADLE_API_TASK_DIR/**\")"
+            task apiJar(type: Jar, dependsOn: classes) {
+                from sourceSets.main.output
+                include "$System.env.GRADLE_API_TASK_DIR/**"
+                classifier = 'api'
+            }
+        }
+
+        if (envExists("GRADLE_ADD_SOURCES_TASK")) {
+            println "Adding sourcesJar task"
+            task sourcesJar(type: Jar, dependsOn: classes) {
+                from sourceSets.main.allSource
+                classifier = 'sources'
+            }
+        }
+
+        if (envExists("GRADLE_ADD_DEOBF_TASK")) {
+            println "Adding deobfJar task"
+            task deobfJar(type: Jar) {
+                from sourceSets.main.output
+                classifier = 'deobf'
+            }
+        }
+
+        artifacts {
+            if (envExists("GRADLE_API_TASK_DIR")) archives apiJar
+            if (envExists("GRADLE_ADD_SOURCES_TASK")) archives sourcesJar
+            if (envExists("GRADLE_ADD_DEOBF_TASK")) archives deobfJar
+        }
+
+        //For shitty tasks
+
+        if (envExists("GRADLE_OVERWRITE_DEOBF_TASK")) {
+            println "Overwriting deobfJar task"
+            deobfJar.classifier = 'deobf'
+            deobfJar.archiveName = "${deobfJar.baseName}-${deobfJar.version}-${deobfJar.classifier}.${deobfJar.extension}"
+        }
+
+        if (envExists("GRADLE_OVERWRITE_API_TASK")) {
+            println "Overwriting apiJar task"
+            apiJar.classifier = 'api'
+            apiJar.archiveName = "${apiJar.baseName}-${apiJar.version}-${apiJar.classifier}.${apiJar.extension}"
+        }
+
+        if (envExists("GRADLE_OVERWRITE_SOURCES_TASK")) {
+            println "Overwriting sourcesJar task"
+            sourcesJar.classifier = 'sources'
+            sourcesJar.archiveName = "${sourcesJar.baseName}-${sourcesJar.version}-${sourcesJar.classifier}.${sourcesJar.extension}"
+        }
+
+        if (envExists("GRADLE_OVERWRITE_JAR_TASK")) {
+            println "Overwriting jar task"
+            jar.archiveName = "${jar.baseName}-${jar.version}.${jar.extension}"
+        }
+    }
+}
