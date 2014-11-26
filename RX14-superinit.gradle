@@ -58,18 +58,21 @@ rootProject {
 
         if (envExists("GRADLE_OVERWRITE_DEOBF_TASK")) {
             println "Overwriting deobfJar task"
+            deobfJar.appendix = null
             deobfJar.classifier = 'deobf'
             deobfJar.archiveName = "${deobfJar.baseName}-${deobfJar.version}-${deobfJar.classifier}.${deobfJar.extension}"
         }
 
         if (envExists("GRADLE_OVERWRITE_API_TASK")) {
             println "Overwriting apiJar task"
+            apiJar.appendix = null
             apiJar.classifier = 'api'
             apiJar.archiveName = "${apiJar.baseName}-${apiJar.version}-${apiJar.classifier}.${apiJar.extension}"
         }
 
         if (envExists("GRADLE_OVERWRITE_SOURCES_TASK")) {
             println "Overwriting sourcesJar task"
+            sourcesJar.appendix = null
             sourcesJar.classifier = 'sources'
             sourcesJar.archiveName = "${sourcesJar.baseName}-${sourcesJar.version}-${sourcesJar.classifier}.${sourcesJar.extension}"
         }
