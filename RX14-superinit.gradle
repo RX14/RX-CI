@@ -24,8 +24,6 @@ rootProject {
         //For missing tasks
 
         if (envExists("GRADLE_API_TASK_DIR")) {
-            if (project.hasProperty("apiJar")) { project.tasks.remove apiJar }
-
             println "Adding apiJar task (include \"$System.env.GRADLE_API_TASK_DIR/**\")"
             task apiJar(type: Jar, dependsOn: classes) {
                 from sourceSets.main.output
@@ -35,8 +33,6 @@ rootProject {
         }
 
         if (envExists("GRADLE_ADD_SOURCES_TASK")) {
-            if (project.hasProperty("sourcesJar")) { project.tasks.remove sourcesJar }
-
             println "Adding sourcesJar task"
             task sourcesJar(type: Jar, dependsOn: classes) {
                 from sourceSets.main.allSource
@@ -45,8 +41,6 @@ rootProject {
         }
 
         if (envExists("GRADLE_ADD_DEOBF_TASK")) {
-            if (project.hasProperty("deobfJar")) { project.tasks.remove deobfJar }
-
             println "Adding deobfJar task"
             task deobfJar(type: Jar) {
                 from sourceSets.main.output
